@@ -1,0 +1,167 @@
+/*
+===============================================================
+Procedure Name : bronze.load_bronze
+Author         : Syed Tayeeb Ahamed
+Created On     : [Insert Date]
+Description    : Full-load ingestion of raw CRM and ERP datasets
+                 into the bronze layer of the data warehouse.
+                 Uses BULK INSERT to load CSV files into staging
+                 tables with detailed logging, duration tracking,
+                 and error diagnostics.
+
+Key Features:
+ - Truncates and reloads CRM and ERP tables from local CSV files
+ - Tracks load duration for each table
+ - Logs progress using PRINT statements
+ - Captures batch start/end time
+ - Handles errors using TRY...CATCH with detailed diagnostics
+
+Dependencies:
+ - CSV files must exist in the specified local paths
+ - Tables must be pre-created using the bronze layer DDL script
+
+Usage:
+ EXEC bronze.load_bronze;
+
+===============================================================
+*/
+
+CREATE OR ALTER PROCEDURE bronze.load_bronze AS
+BEGIN
+    DECLARE @Start_time DATETIME, @End_time DATETIME, @batch_start_time DATETIME, @batch_end_time DATETIME;
+
+    BEGIN TRY
+        SET @batch_start_time = GETDATE();
+
+        PRINT('==============================================');
+        PRINT('Starting Full Load into Bronze Layer');
+        PRINT('==============================================');
+
+        -- CRM_CUST_INFO
+        SET @Start_time = GETDATE();
+        PRINT('----------------------------------------------');
+        PRINT('Truncating and Loading CRM_CUST_INFO');
+        PRINT('----------------------------------------------');
+        TRUNCATE TABLE [bronze].[crm_cust_info];
+        PRINT('Table [bronze].[crm_cust_info] truncated');
+        BULK INSERT [bronze].[crm_cust_info]
+        FROM 'C:\Users\ssyed\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\cust_info.csv'
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = ',',
+            TABLOCK
+        );
+        SET @End_time = GETDATE();
+        PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @Start_time, @End_time) AS NVARCHAR) + ' seconds';
+        PRINT('Data loaded into [bronze].[crm_cust_info]');
+
+        -- CRM_PRD_INFO
+        SET @Start_time = GETDATE();
+        PRINT('----------------------------------------------');
+        PRINT('Truncating and Loading CRM_PRD_INFO');
+        PRINT('----------------------------------------------');
+        TRUNCATE TABLE [bronze].[crm_prd_info];
+        PRINT('Table [bronze].[crm_prd_info] truncated');
+        BULK INSERT [bronze].[crm_prd_info]
+        FROM 'C:\Users\ssyed\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\prd_info.csv'
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = ',',
+            TABLOCK
+        );
+        SET @End_time = GETDATE();
+        PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @Start_time, @End_time) AS NVARCHAR) + ' seconds';
+        PRINT('Data loaded into [bronze].[crm_prd_info]');
+
+        -- CRM_SALES_DETAILS
+        SET @Start_time = GETDATE();
+        PRINT('----------------------------------------------');
+        PRINT('Truncating and Loading CRM_SALES_DETAILS');
+        PRINT('----------------------------------------------');
+        TRUNCATE TABLE [bronze].[crm_sales_details];
+        PRINT('Table [bronze].[crm_sales_details] truncated');
+        BULK INSERT [bronze].[crm_sales_details]
+        FROM 'C:\Users\ssyed\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_crm\sales_details.csv'
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = ',',
+            TABLOCK
+        );
+        SET @End_time = GETDATE();
+        PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @Start_time, @End_time) AS NVARCHAR) + ' seconds';
+        PRINT('Data loaded into [bronze].[crm_sales_details]');
+
+        -- ERP_CUST_AZ12
+        PRINT('==============================================');
+        PRINT('Loading ERP Tables');
+        PRINT('==============================================');
+        SET @Start_time = GETDATE();
+        PRINT('----------------------------------------------');
+        PRINT('Truncating and Loading ERP_CUST_AZ12');
+        PRINT('----------------------------------------------');
+        TRUNCATE TABLE [bronze].[erp_CUST_AZ12];
+        PRINT('Table [bronze].[erp_CUST_AZ12] truncated');
+        BULK INSERT [bronze].[erp_CUST_AZ12]
+        FROM 'C:\Users\ssyed\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\CUST_AZ12.csv'
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = ',',
+            TABLOCK
+        );
+        SET @End_time = GETDATE();
+        PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @Start_time, @End_time) AS NVARCHAR) + ' seconds';
+        PRINT('Data loaded into [bronze].[erp_CUST_AZ12]');
+
+        -- ERP_LOC_A101
+        SET @Start_time = GETDATE();
+        PRINT('----------------------------------------------');
+        PRINT('Truncating and Loading ERP_LOC_A101');
+        PRINT('----------------------------------------------');
+        TRUNCATE TABLE [bronze].[erp_LOC_A101];
+        PRINT('Table [bronze].[erp_LOC_A101] truncated');
+        BULK INSERT [bronze].[erp_LOC_A101]
+        FROM 'C:\Users\ssyed\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\LOC_A101.csv'
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = ',',
+            TABLOCK
+        );
+        SET @End_time = GETDATE();
+        PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @Start_time, @End_time) AS NVARCHAR) + ' seconds';
+        PRINT('Data loaded into [bronze].[erp_LOC_A101]');
+
+        -- ERP_PX_CAT_G1V2
+        SET @Start_time = GETDATE();
+        PRINT('----------------------------------------------');
+        PRINT('Truncating and Loading ERP_PX_CAT_G1V2');
+        PRINT('----------------------------------------------');
+        TRUNCATE TABLE [bronze].[erp_PX_CAT_G1V2];
+        PRINT('Table [bronze].[erp_PX_CAT_G1V2] truncated');
+        BULK INSERT [bronze].[erp_PX_CAT_G1V2]
+        FROM 'C:\Users\ssyed\Downloads\sql-data-warehouse-project\sql-data-warehouse-project\datasets\source_erp\PX_CAT_G1V2.csv'
+        WITH (
+            FIRSTROW = 2,
+            FIELDTERMINATOR = ',',
+            TABLOCK
+        );
+        SET @End_time = GETDATE();
+        PRINT '>> Load Duration: ' + CAST(DATEDIFF(SECOND, @Start_time, @End_time) AS NVARCHAR) + ' seconds';
+        PRINT('Data loaded into [bronze].[erp_PX_CAT_G1V2]');
+
+        -- Completion
+        PRINT('==============================================');
+        PRINT('Bronze Layer Load Completed Successfully');
+        PRINT('==============================================');
+        SET @batch_end_time = GETDATE();
+        PRINT '>> Batch Duration: ' + CAST(DATEDIFF(SECOND, @batch_start_time, @batch_end_time) AS VARCHAR) + ' seconds';
+
+    END TRY
+    BEGIN CATCH
+        PRINT '=======================================================';
+        PRINT 'Error occurred during loading bronze layer';
+        PRINT 'Error Message: ' + ERROR_MESSAGE();
+        PRINT 'Error Number: ' + CAST(ERROR_NUMBER() AS VARCHAR(10));
+        PRINT 'Error Line: ' + CAST(ERROR_LINE() AS VARCHAR(10));
+        PRINT '=======================================================';
+    END CATCH
+END
